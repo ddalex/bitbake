@@ -562,7 +562,7 @@ def task( request, build_id, task_id ):
         coveredBy = sorted(generateCoveredList2( _find_task_revdep( task_object ) ), key = lambda x: x.recipe.name)
     log_head = ''
     log_body = ''
-    if task_object.outcome == task.OUTCOME_FAILED:
+    if task_object.outcome == task_object.OUTCOME_FAILED:
         pass
 
     uri_list= [ ]
@@ -604,7 +604,7 @@ def recipe(request, build_id, recipe_id, active_tab="1"):
         return redirect(builds)
 
     recipe_object = Recipe.objects.get(pk=recipe_id)
-    layer_version = Layer_Version.objects.get(pk=object.layer_version_id)
+    layer_version = Layer_Version.objects.get(pk=recipe_object.layer_version_id)
     layer  = Layer.objects.get(pk=layer_version.layer_id)
     tasks_list  = Task.objects.filter(recipe_id = recipe_id, build_id = build_id).exclude(order__isnull=True).exclude(task_name__endswith='_setscene').exclude(outcome=Task.OUTCOME_NA)
     package_count = Package.objects.filter(recipe_id = recipe_id).filter(build_id = build_id).filter(size__gte=0).count()
