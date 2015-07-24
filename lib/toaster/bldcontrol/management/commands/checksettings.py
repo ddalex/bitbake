@@ -99,10 +99,11 @@ class Command(NoArgsCommand):
 
         # find configuration files
         config_files = []
+        selected_dirs = []
         for dirname in self._recursive_list_directories(be.sourcedir,2):
             if os.path.exists(os.path.join(dirname, ".templateconf")):
                 import subprocess
-                proc = subprocess.Popen('bash -c ". '+os.path.join(dirname, ".templateconf")+r'; echo \"$TEMPLATECONF\""', shell=True, stdout=subprocess.PIPE)
+                proc = subprocess.Popen('bash -c ". '+os.path.join(dirname, ".templateconf")+r'; echo \"\$TEMPLATECONF\""', shell=True, stdout=subprocess.PIPE)
                 conffilepath, stderroroutput = proc.communicate()
                 proc.wait()
                 if proc.returncode != 0:
@@ -110,6 +111,15 @@ class Command(NoArgsCommand):
 
                 conffilepath = os.path.join(conffilepath.strip(), "toasterconf.json")
                 candidatefilepath = os.path.join(dirname, conffilepath)
+                if "toaster_cloned" in candidatefilepath:
+                    continue
+                if os.path.exists(candidatefilepath):
+                    config_files.append(candidatefilepath)
+                    selected_dirs.append(dirname)
+
+        for dirname in self._recursive_list_directories(be.sourcedir,2):
+            if os.path.exists(os.path.join(dirname, "toasterconf.json")) and not reduce(lambda x,y: x or y, [dirname.startswith(x) for x in selected_dirs], False):
+                candidatefilepath = os.path.join(dirname, "toasterconf.json")
                 if "toaster_cloned" in candidatefilepath:
                     continue
                 if os.path.exists(candidatefilepath):
